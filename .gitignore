@@ -1,0 +1,11 @@
+build
+devel
+*.swp
+*.png
+*.log
+*.pkl
+*.weights
+*.pack
+*.h5
+*.pth
+*.pp

@@ -1,0 +1,16 @@
+openrave.py --database kinematicreachability --robot=x_arm_openrave.xml --manipname=x_arm_hand --numthreads=4
+
+openrave.py --database kinematicreachability --robot=x_arm_openrave.xml --manipname=x_arm_hand --ignorefreespace 
+ 
+openrave.py --database kinematicreachability --robot=x_arm_openrave.xml --manipname=x_arm_hand --show   //python depen: traitsui,pyface,pyside,mayavi,pyqt
+
+openrave.py --database kinematicreachability --robot=x_arm_openrave.xml --manipname=x_arm_hand --xyzdelta=0.01 --quatdelta=0.01 --numthreads=4 --getfilename
+
+openrave.py --database kinematicreachability --robot=x_arm_openrave.xml --manipname=x_arm_hand --xyzdelta=0.01 --quatdelta=0.2 --numthreads=10
+
+openrave.py ./x_arm.dae    //show robot model
+
+check_urdf
+
+rosrun collada_urdf urdf_to_collada
+

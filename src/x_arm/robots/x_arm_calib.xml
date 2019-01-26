@@ -1,0 +1,8 @@
+<robot file="./x_arm_calib.dae">
+ <manipulator name="x_arm_calib" >
+  <base>noInertiaBase</base>
+  <effector>calib_link7</effector>
+  <Translation>0 0 0</Translation>
+  <rotationaxis>0 0 0 0</rotationaxis>
+ </manipulator>
+</robot>

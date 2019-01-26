@@ -1,0 +1,40 @@
+# MoveIt-specific simulation settings
+moveit_sim_hw_interface:
+  joint_model_group: controllers_initial_group_
+  joint_model_group_pose: controllers_initial_pose_
+# Settings for ros_control control loop
+generic_hw_control_loop:
+  loop_hz: 300
+  cycle_time_error_threshold: 0.01
+# Settings for ros_control hardware interface
+hardware_interface:
+  joints:
+    - joint_axis_link1_to_base
+    - joint_axis_link2_to_link1
+    - joint_axis_link3_to_link2
+    - joint_axis_link4_to_link3
+    - joint_axis_link5_to_link4
+    - joint_axis_calib_link6_to_link5
+    - joint_axis_calib_link7_to_calib_link6
+    - joint_axis_link6_to_link5
+    - joint_axis_link7_to_link6
+    - joint_axis_index0_to_handRoot
+    - joint_axis_index1_to_index0
+    - joint_axis_index2_to_index1
+    - joint_axis_joint0_to_handRoot
+    - joint_axis_little1_to_little0
+    - joint_axis_little2_to_little1
+    - joint_axis_middle0_to_handRoot
+    - joint_axis_middle1_to_middle0
+    - joint_axis_middle2_to_middle1
+    - joint_axis_wedding0_to_handRoot
+    - joint_axis_wedding1_to_wedding0
+    - joint_axis_wedding2_to_wedding1
+  sim_control_mode: 1  # 0: position, 1: velocity
+# Publish all joint states
+# Creates the /joint_states topic necessary in ROS
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+controller_list:
+  []

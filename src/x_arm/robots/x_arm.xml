@@ -1,0 +1,8 @@
+<robot file="./x_arm.dae">
+ <manipulator name="x_arm" >
+  <base>noInertiaBase</base>
+  <effector>handRoot</effector>
+  <Translation>0 0 0</Translation>
+  <rotationaxis>0 0 0 0</rotationaxis>
+ </manipulator>
+</robot>
