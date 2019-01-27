@@ -9,9 +9,76 @@
 using namespace cv;
 using namespace std;
 
+short int theta;//plus 1000 to reserve three digit after the dot.
+unsigned char* temp;//temp[1] is the higher 8 digits
+
+char c;
+
 serial::Serial ser_arm,ser_hand; //declare the serial object
 geometry_msgs::PointStamped ball_lscene,ball_robot,ball_robot_sended;
 unsigned char joint_angle_data[18],hand_pos_data[18],hand_cmd[6],calib_angle_data[18];
+
+void set_joint_angle(unsigned char* joint_angle_data,IK_fast_solver::grasp grasp_srv)
+{
+    theta=(short int)(grasp_srv.response.angle0*1000);//plus 1000 to reserve three digit after the dot.
+    temp=(unsigned char *)&theta;//temp[1] is the higher 8 digits
+    *(joint_angle_data+4)=temp[1];  *(joint_angle_data+5)=temp[0];
+
+    theta=(short int)(grasp_srv.response.angle1*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+6)=temp[1];  *(joint_angle_data+7)=temp[0];
+
+    theta=(short int)(grasp_srv.response.angle2*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+8)=temp[1];  *(joint_angle_data+9)=temp[0];
+
+    theta=(short int)(grasp_srv.response.angle3*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+10)=temp[1];  *(joint_angle_data+11)=temp[0];
+
+    theta=(short int)(grasp_srv.response.angle4*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+12)=temp[1];  *(joint_angle_data+13)=temp[0];
+
+    theta=(short int)(grasp_srv.response.angle5*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+14)=temp[1];  *(joint_angle_data+15)=temp[0];
+
+    theta=(short int)(grasp_srv.response.angle6*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+16)=temp[1];  *(joint_angle_data+17)=temp[0];
+}
+
+void set_joint_angle_const(unsigned char* joint_angle_data,float angle0,float angle1,float angle2,float angle3,float angle4,float angle5,float angle6)
+{
+    theta=(short int)(angle0*1000);//plus 1000 to reserve three digit after the dot.
+    temp=(unsigned char *)&theta;//temp[1] is the higher 8 digits
+    *(joint_angle_data+4)=temp[1];  *(joint_angle_data+5)=temp[0];
+
+    theta=(short int)(angle1*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+6)=temp[1];  *(joint_angle_data+7)=temp[0];
+
+    theta=(short int)(angle2*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+8)=temp[1];  *(joint_angle_data+9)=temp[0];
+
+    theta=(short int)(angle3*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+10)=temp[1];  *(joint_angle_data+11)=temp[0];
+
+    theta=(short int)(angle4*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+12)=temp[1];  *(joint_angle_data+13)=temp[0];
+
+    theta=(short int)(angle5*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+14)=temp[1];  *(joint_angle_data+15)=temp[0];
+
+    theta=(short int)(angle6*1000);
+    temp=(unsigned char *)&theta;
+    *(joint_angle_data+16)=temp[1];  *(joint_angle_data+17)=temp[0];
+}
 
 void Ser_Arm_Initialize()
 {

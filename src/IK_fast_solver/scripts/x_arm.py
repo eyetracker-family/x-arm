@@ -158,11 +158,11 @@ class x_arm:
                         break
 
         # calculate the grasp position with offset
-        graspOffset = 0.01  # unit: m
+        graspOffset = 0.02  # unit: m
         planedOrientationWithOffset = np.zeros([4])
         planedJointsAngleWithOffset = np.zeros([7])  # grasp joints angle
 
-        graspPosition = targetPosition + matrixFromQuat(planedOrientation)[0:3, 2] * graspOffset
+        graspPosition = targetPosition + matrixFromQuat(planedOrientation)[0:3, 2] * graspOffset -  matrixFromQuat(planedOrientation)[0:3, 0] * graspOffset
 
         self.graspPositionWithOffset = graspPosition
 
@@ -271,7 +271,7 @@ class x_arm:
         targetPosition = targetPose[0:3]
         objectOrientation = targetPose[3:7]
 
-        calibOffSet = 0.1  # unit: m
+        calibOffSet = 0.12  # unit: m
 
         planedOrientation = self.grapsPoseGen(targetPosition, objectOrientation)
         T = matrixFromQuat(planedOrientation)
