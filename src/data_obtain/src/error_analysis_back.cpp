@@ -19,21 +19,6 @@ int main(int argc,char** argv)
 
 	stereo_calibrate_initialize();
 
-    setIdentity(leftTagCenterFilter.transitionMatrix);
-    setIdentity(leftTagCenterFilter.measurementMatrix);
-    setIdentity(leftTagCenterFilter.processNoiseCov,Scalar::all(0.05));
-    setIdentity(leftTagCenterFilter.measurementNoiseCov,Scalar::all(1));
-    setIdentity(leftTagCenterFilter.errorCovPost,Scalar::all(1));
-    randn(leftTagCenterFilter.statePost,Scalar::all(0),Scalar::all(1));
-
-    setIdentity(rightTagCenterFilter.transitionMatrix);
-    setIdentity(rightTagCenterFilter.measurementMatrix);
-    setIdentity(rightTagCenterFilter.processNoiseCov,Scalar::all(0.05));
-    setIdentity(rightTagCenterFilter.measurementNoiseCov,Scalar::all(1));
-    setIdentity(rightTagCenterFilter.errorCovPost,Scalar::all(1));
-    randn(rightTagCenterFilter.statePost,Scalar::all(0),Scalar::all(1));
-
-
 	while(nh.ok())
     {
 		ros::spinOnce();
@@ -55,49 +40,17 @@ int main(int argc,char** argv)
 	    cv::aruco::detectMarkers(img2_remap, dictionary, r_corners, r_ids);
 
 	    cv::Point l_center(0,0),r_center(0,0);
-
-        std::vector<cv::Point2f> leftTagCenters, rightTagCenters;
-
-
 	    if ( l_ids.size() > 0) {
 		    cv::aruco::drawDetectedMarkers(img1_remap, l_corners, l_ids);
-            arcuoTagCenter(l_corners,leftTagCenters);
 
-//		    l_center.x=l_corners[0][0].x;
-//		    l_center.y=l_corners[0][0].y;
-
-            cv::drawMarker(img1_remap,leftTagCenters.at(0),Scalar(0, 255, 0),MARKER_CROSS,40,1);
-
-            leftTagCenterFilter.predict();
-            leftTagCenterMeas.at<float>(0,0)= leftTagCenters.at(0).x;
-            leftTagCenterMeas.at<float>(1,0)= leftTagCenters.at(0).y;
-            leftTagCenterAfterFilter = leftTagCenterFilter.correct(leftTagCenterMeas);
-
-            l_center.x=int(leftTagCenterAfterFilter.at<float>(0,0)+0.5);
-            l_center.y=int(leftTagCenterAfterFilter.at<float>(1,0)+0.5);
-
-            cv::drawMarker(img1_remap,l_center,Scalar(0, 0, 255),MARKER_TILTED_CROSS,40,1);
+		    l_center.x=l_corners[0][0].x;
+		    l_center.y=l_corners[0][0].y;
 	    }
 	    if ( r_ids.size() > 0) {
 		    cv::aruco::drawDetectedMarkers(img2_remap, r_corners, r_ids);
-            arcuoTagCenter(r_corners,rightTagCenters);
 
-//		    r_center.x=r_corners[0][0].x;
-//		    r_center.y=r_corners[0][0].y;
-
-            cv::drawMarker(img2_remap,rightTagCenters.at(0),Scalar(0, 255, 0),MARKER_CROSS,40,1);
-
-            rightTagCenterFilter.predict();
-            rightTagCenterMeas.at<float>(0,0)= rightTagCenters.at(0).x;
-            rightTagCenterMeas.at<float>(1,0)= rightTagCenters.at(0).y;
-            rightTagCenterAfterFilter = rightTagCenterFilter.correct(rightTagCenterMeas);
-
-            r_center.x=int(rightTagCenterAfterFilter.at<float>(0,0)+0.5);
-            r_center.y=int(rightTagCenterAfterFilter.at<float>(1,0)+0.5);
-
-
-            cv::drawMarker(img2_remap,r_center,Scalar(0, 0, 255),MARKER_TILTED_CROSS,40,1);
-
+		    r_center.x=r_corners[0][0].x;
+		    r_center.y=r_corners[0][0].y;
 	    }
         imshow("l_aruco",img1_remap);
         imshow("r_aruco",img2_remap);

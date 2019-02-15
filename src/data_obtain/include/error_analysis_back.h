@@ -9,24 +9,12 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include <opencv2/aruco.hpp>
 
-#include <opencv2/video/tracking.hpp>
-
 using namespace cv;
 using namespace std;
 
 Mat xyz;
 Mat map11, map12, map21, map22;
 Size img_size(1280,720);
-
-KalmanFilter leftTagCenterFilter(2,2,0,CV_32F);
-Mat leftTagCenterAfterFilter(2,1,CV_32F);
-Mat leftTagCenterMeas=Mat::zeros(2,1,CV_32F);
-
-
-KalmanFilter rightTagCenterFilter(2,2,0,CV_32F);
-Mat rightTagCenterAfterFilter(2,1,CV_32F);
-Mat rightTagCenterMeas=Mat::zeros(2,1,CV_32F);
-
 
 float scale=1;
 Rect roi1, roi2;
@@ -39,45 +27,6 @@ std::string intrinsic_filename = "/home/x-arm/macaca/data/reconstruction/intrins
 std::string extrinsic_filename = "/home/x-arm/macaca/data/reconstruction/extrinsics.yml";
 
 geometry_msgs::PointStamped ball_lscene,ball_robot;
-
-
-void arcuoTagCenter(std::vector<std::vector<cv::Point2f>>& corners, std::vector<cv::Point2f>& centers)
-{
-    cv::Point3f point0,point1,point2,point3,line02,line13,intersection;
-
-    cv::Point2f center;
-
-    std::vector<std::vector<cv::Point2f>>::iterator it= corners.begin();
-    for(;it!=corners.end();it++)
-    {
-        point0.x = (*it).at(0).x;
-        point0.y = (*it).at(0).y;
-        point0.z = 1;
-
-        point1.x = (*it).at(1).x;
-        point1.y = (*it).at(1).y;
-        point1.z = 1;
-
-        point2.x = (*it).at(2).x;
-        point2.y = (*it).at(2).y;
-        point2.z = 1;
-
-        point3.x = (*it).at(3).x;
-        point3.y = (*it).at(3).y;
-        point3.z = 1;
-
-        line02 = point0.cross(point2);
-        line13 = point1.cross(point3);
-
-        intersection = line02.cross(line13);
-
-        center.x = intersection.x/intersection.z;
-        center.y = intersection.y/intersection.z;
-
-        centers.push_back(center);
-    }
-}
-
 
 void pos_callback(const geometry_msgs::PointStamped::ConstPtr& msg) 
 {

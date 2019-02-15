@@ -27,6 +27,12 @@ def handle_query_solution(req):
         x_arm_plan.robotUpdate()
         print('grasp_angle: %f %f %f %f %f %f %f'%(angle[0],angle[1],angle[2],angle[3],angle[4],angle[5],angle[6]))
         return angle[0],angle[1],angle[2],angle[3],angle[4],angle[5],angle[6]
+    if req.flag==3:#directGrasp
+        angle = x_arm_plan.directGrasp([req.x, req.y, req.z, req.q_w, req.q_x, req.q_y, req.q_z])
+        x_arm_plan.robotUpdate()
+        print('grasp_angle: %f %f %f %f %f %f %f'%(angle[0],angle[1],angle[2],angle[3],angle[4],angle[5],angle[6]))
+        return angle[0],angle[1],angle[2],angle[3],angle[4],angle[5],angle[6]
+
 
 def query_solution_server():
     rospy.init_node('query_solution_server')

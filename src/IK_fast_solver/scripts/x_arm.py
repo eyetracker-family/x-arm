@@ -158,7 +158,7 @@ class x_arm:
                         break
 
         # calculate the grasp position with offset
-        graspOffset = 0.02  # unit: m
+        graspOffset = 0  # unit: m
         planedOrientationWithOffset = np.zeros([4])
         planedJointsAngleWithOffset = np.zeros([7])  # grasp joints angle
 
@@ -271,7 +271,8 @@ class x_arm:
         targetPosition = targetPose[0:3]
         objectOrientation = targetPose[3:7]
 
-        calibOffSet = 0.12  # unit: m
+        #calibOffSet = 0.12  # unit: m
+        calibOffSet = 0  # unit: m
 
         planedOrientation = self.grapsPoseGen(targetPosition, objectOrientation)
         T = matrixFromQuat(planedOrientation)
@@ -336,6 +337,78 @@ class x_arm:
         else:
             print "compensation out of joint limit"
             return self.preGraspJointsAngle
+
+    def directGrasp(self, targetPose):  # position: x,y,z + objectOrientation: w,x,y,z
+
+        targetPosition = targetPose[0:3]
+        objectOrientation = targetPose[3:7]
+
+        calibOffSet = 0  # unit: m
+
+        planedOrientation = self.grapsPoseGen(targetPosition, objectOrientation)
+        T = matrixFromQuat(planedOrientation)
+
+        if (np.abs(np.linalg.norm(objectOrientation) - 1) < 1e-1):
+            calibPosition = self.graspPositionWithOffset + T[0:3, 2] * calibOffSet * 0.6 - T[0:3,
+                                                                                           0] * calibOffSet * 0.6  # grasp object with orientation
+        else:
+            calibPosition = self.graspPositionWithOffset + T[0:3, 2] * calibOffSet  # grasp ball
+
+        positionInDatabase = (np.round(calibPosition, 2) * 100 + self.center).astype(int)
+        [numSolution, solutionStartIndex] = self.poseSolutionsIndexInSerialization[positionInDatabase[0],
+                                            positionInDatabase[1],
+                                            positionInDatabase[2], :]
+        preGraspOrientation = np.zeros([1, 4])
+        preGraspOrientationLoss = 10000
+        preGraspAnglesLoss = 10000
+
+        planedOrientationQuat = pyQuat(planedOrientation)
+        for i in range(solutionStartIndex.astype(int), (solutionStartIndex + numSolution).astype(int), 1):
+            with self.env:
+                while True:
+                    # if not self.robot.CheckSelfCollision():
+                    if True:
+                        T = matrixFromQuat(self.reachabilitySet[i, :])  # matrixFromQuat(np.array([w,x,y,z]))
+                        T[0:3, 3] = calibPosition
+                        # solutions = self.robotIkmodel.manip.FindIKSolutions(T,IkFilterOptions.CheckEnvCollisions)
+                        solutions = self.robotIkmodel.manip.FindIKSolutions(T, 0)
+                        if solutions is not None and len(solutions) > 0:
+                            calibOrientationQuat = pyQuat(self.reachabilitySet[i, :])
+                            tempLoss = pyQuat.absolute_distance(planedOrientationQuat, calibOrientationQuat)
+                            if (tempLoss < preGraspOrientationLoss):
+                                preGraspOrientationLoss = tempLoss
+                                preGraspOrientation = self.reachabilitySet[i, :]
+                    break
+
+        with self.env:
+            while True:
+                # if not self.robot.CheckSelfCollision():
+                if True:
+                    T = matrixFromQuat(preGraspOrientation)  # matrixFromQuat(np.array([w,x,y,z]))
+                    T[0:3, 3] = calibPosition
+                    # solutions = self.robotIkmodel.manip.FindIKSolutions(T,IkFilterOptions.CheckEnvCollisions)
+                    solutions = self.robotIkmodel.manip.FindIKSolutions(T, 0)
+                    if solutions is not None and len(solutions) > 0:
+                        for j in range(len(solutions)):
+                            tempLoss = np.array([0, 0, 0, 0, 1, 1, 1]).dot(
+                                np.abs((solutions[j, :] - self.jointsCenter) / self.jointsRange))
+                            if (np.sum(solutions[j, :] > self.jointsUpLimit) == 0 and
+                                    np.sum(solutions[j, :] < self.jointsDownLimit) == 0 and
+                                    tempLoss < preGraspAnglesLoss):
+                                preGraspAnglesLoss = tempLoss
+                                preGraspAngles = solutions[j, :]
+                break
+
+        self.preGraspJointsAngle = preGraspAngles
+
+        tempAngle = self.currentJointError + self.preGraspJointsAngle
+        if (np.sum(tempAngle > self.jointsUpLimit) == 0 and
+                np.sum(tempAngle < self.jointsDownLimit) == 0):
+            return self.currentJointError + self.preGraspJointsAngle
+        else:
+            print "compensation out of joint limit"
+            return self.preGraspJointsAngle
+
 
     def calibCompensation(self, trackerPose):  # pose: position(x,y,z) + orientation(w,x,y,z)
         angleLoss = 10000

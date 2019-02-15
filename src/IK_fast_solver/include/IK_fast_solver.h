@@ -18,6 +18,9 @@ serial::Serial ser_arm,ser_hand; //declare the serial object
 geometry_msgs::PointStamped ball_lscene,ball_robot,ball_robot_sended;
 unsigned char joint_angle_data[18],hand_pos_data[18],hand_cmd[6],calib_angle_data[18];
 
+tf::StampedTransform joint6_robot;
+geometry_msgs::PointStamped hand_tracker2,hand_robot;//for error detection
+
 void set_joint_angle(unsigned char* joint_angle_data,IK_fast_solver::grasp grasp_srv)
 {
     theta=(short int)(grasp_srv.response.angle0*1000);//plus 1000 to reserve three digit after the dot.

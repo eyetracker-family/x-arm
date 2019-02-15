@@ -1,0 +1,15 @@
+if steamVR can not be launched, please check:
+
+the file openvrpaths.vrpath in the ~/.config/openvr
+
+
+make the contents of the "config" and "log" as following
+
+{
+   "config" : [ "/home/x-arm/.steam/steam/config" ],
+   "external_drivers" : null,
+   "jsonid" : "vrpathreg",
+   "log" : [ "/home/x-arm/.steam/steam/logs" ],
+   "runtime" : [ "/home/x-arm/.local/share/Steam/steamapps/common/SteamVR/", "/home/x-arm/.local/share/Steam/steamapps/common/SteamVR" ],
+   "version" : 1
+}
